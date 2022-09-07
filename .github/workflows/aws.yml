@@ -68,7 +68,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: sample-nodejs-app
+          ECR_REPOSITORY: fargate-nodejs-app
           IMAGE_TAG: latest
 
         run: |
@@ -83,21 +83,21 @@ jobs:
         id: push-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: sample-nodejs-app
+          ECR_REPOSITORY: fargate-nodejs-app
           IMAGE_TAG: latest
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
       - name: Download task definition
-        run: aws ecs describe-task-definition --task-definition sample-nodejs-app --query taskDefinition > task-definition.json
+        run: aws ecs describe-task-definition --task-definition fargate-node-task-defn --query taskDefinition > task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: update-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: sample-nodejs-app
+          container-name: nodejs-app-container
           image: ${{ steps.push-image.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
@@ -105,5 +105,5 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.update-task-def.outputs.task-definition }}
-          service: node-app--service
-          cluster: node-app-cluster
+          service: fargate-node-service
+          cluster: fargate-node-cluster
