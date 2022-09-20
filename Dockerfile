@@ -13,5 +13,6 @@ WORKDIR /usr
 COPY package.json ./
 RUN npm install --only=production
 COPY --from=0 /usr/dist .
+RUN ls -a
 EXPOSE 80
 CMD [ "node", "dist/index.js" ]
