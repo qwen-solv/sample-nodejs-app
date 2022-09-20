@@ -12,7 +12,7 @@ FROM node:16-alpine
 WORKDIR /usr
 COPY package.json ./
 RUN npm install --only=production
-COPY --from=0 /usr/dist .
+COPY --from=0 /usr/dist ./dist
 RUN ls -a
 EXPOSE 80
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "dist/src/index.js" ]
